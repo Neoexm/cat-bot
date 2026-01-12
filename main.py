@@ -89,6 +89,48 @@ cattypes = list(type_dict.keys())
 # generate a dict with lowercase'd keys
 cattype_lc_dict = {i.lower(): i for i in cattypes}
 
+# Stock Market Logic
+MARKET_FILE = "config/market.json"
+MARKET_UPDATE_INTERVAL = 4 * 60 * 60  # 4 hours
+
+def get_market_data():
+    if not os.path.exists(MARKET_FILE):
+        return update_market_prices()
+    
+    try:
+        with open(MARKET_FILE, "r") as f:
+            data = json.load(f)
+        
+        if time.time() - data.get("last_update", 0) > MARKET_UPDATE_INTERVAL:
+            return update_market_prices()
+        return data
+    except Exception:
+        return update_market_prices()
+
+def update_market_prices():
+    # Base prices roughly based on 10000 / weight to give common cats some value
+    # Example: Fine (1000) -> Base 10
+    # Example: eGirl (2) -> Base 5000
+    
+    new_prices = {}
+    for cat, weight in type_dict.items():
+        base_price = max(10, int(10000 / weight))
+        
+        # Fluctuation: +/- 50%
+        fluctuation = random.uniform(0.5, 1.5)
+        price = max(1, int(base_price * fluctuation))
+        new_prices[cat] = price
+    
+    data = {
+        "last_update": time.time(),
+        "prices": new_prices
+    }
+    
+    with open(MARKET_FILE, "w") as f:
+        json.dump(data, f)
+    
+    return data
+
 allowedemojis = []
 for i in cattypes:
     allowedemojis.append(i.lower() + "cat")
@@ -2147,8 +2189,41 @@ async def on_message(message: discord.Message):
                 view = None
                 button = None
 
+                async def dark_market_cutscene(interaction):
+                    nonlocal message
+                    if interaction.user != message.author:
+                        await interaction.response.send_message(
+                            "the shadow you saw runs away. perhaps you need to be the one to catch the cat.",
+                            ephemeral=True,
+                        )
+                        return
+                    if user.dark_market_active:
+                        await interaction.response.send_message("the shadowy figure is nowhere to be found.", ephemeral=True)
+                        return
+                    user.dark_market_active = True
+                    await user.save()
+                    await interaction.response.send_message("is someone watching after you?", ephemeral=True)
+
+                    dark_market_followups = [
+                        "you walk up to them. the dark voice says:",
+                        "**???**: Hello. We have a unique deal for you.",
+                        "**???**: To access our services, run /catnip.",
+                        "**???**: You won't be disappointed.",
+                        "before you manage to process that, the figure disappears. will you figure out whats going on?",
+                        "the only choice is to go to that place.",
+                    ]
+
+                    for phrase in dark_market_followups:
+                        await asyncio.sleep(5)
+                        await interaction.followup.send(phrase, ephemeral=True)
+
+                    await achemb(message, "dark_market", "followup")
+
                 vote_time_user = await User.get_or_create(user_id=message.author.id)
-                if config.WEBHOOK_VERIFY and vote_time_user.vote_time_topgg + 43200 < time.time():
+                if random.randint(0, 10) == 0 and user.total_catches > 50 and not user.dark_market_active:
+                    button = Button(label="You see a shadow...", style=ButtonStyle.red)
+                    button.callback = dark_market_cutscene
+                elif config.WEBHOOK_VERIFY and vote_time_user.vote_time_topgg + 43200 < time.time():
                     button = Button(
                         emoji=get_emoji("topgg"),
                         label=random.choice(vote_button_texts),
@@ -2476,6 +2551,113 @@ async def on_guild_join(guild):
             )
     except Exception:
         pass
+
+
+@bot.tree.command(description="View the current Cat Market prices")
+async def market(interaction: discord.Interaction):
+    market_data = get_market_data()
+    prices = market_data["prices"]
+    last_update = market_data["last_update"]
+    
+    # Sort by price descending
+    sorted_prices = sorted(prices.items(), key=lambda x: x[1], reverse=True)
+    
+    description = f"prices updated every 4h. managed by corruption.\nlast update: <t:{int(last_update)}:R>\n\n"
+    
+    for cat_type, price in sorted_prices:
+        emoji = get_emoji(cat_type.lower() + "cat")
+        description += f"{emoji} **{cat_type}**: ${price:,}\n"
+        
+    embed = discord.Embed(
+        title="📈 The Stonk Market", 
+        description=description, 
+        color=Colors.green
+    )
+    user_profile = await Profile.get_or_create(guild_id=interaction.guild.id, user_id=interaction.user.id)
+    embed.set_footer(text=f"your money: ${user_profile.roulette_balance:,}")
+    
+    await interaction.response.send_message(embed=embed)
+
+
+@bot.tree.command(description="Buy a cat from the market")
+@discord.app_commands.describe(cat_type="The type of cat to buy")
+@discord.app_commands.autocomplete(cat_type=cat_type_autocomplete)
+async def buy_cat(interaction: discord.Interaction, cat_type: str):
+    market_data = get_market_data()
+    prices = market_data["prices"]
+    
+    # normalize input
+    cat_key = None
+    for k in prices.keys():
+        if k.lower() == cat_type.lower():
+            cat_key = k
+            break
+            
+    if not cat_key:
+        await interaction.response.send_message("cat not found. are you hallucinating?", ephemeral=True)
+        return
+        
+    price = prices[cat_key]
+    user = await Profile.get_or_create(guild_id=interaction.guild.id, user_id=interaction.user.id)
+    
+    if user.roulette_balance < price:
+        await interaction.response.send_message(f"you can't afford this lol. get more money.", ephemeral=True)
+        return
+        
+    # transaction
+    user.roulette_balance -= price
+    user[f"cat_{cat_key}"] += 1
+    await user.save()
+    
+    emoji = get_emoji(cat_key.lower() + "cat")
+    embed = discord.Embed(
+        title="Market Purchase",
+        description=f"successfully scammed- i mean sold you a {emoji} **{cat_key}** for **${price:,}**",
+        color=Colors.green
+    )
+    embed.set_footer(text=f"new balance: ${user.roulette_balance:,}")
+    await interaction.response.send_message(embed=embed)
+
+
+@bot.tree.command(description="Sell a cat to the market")
+@discord.app_commands.describe(cat_type="The type of cat to sell")
+@discord.app_commands.autocomplete(cat_type=cat_command_autocomplete)
+async def sell_cat(interaction: discord.Interaction, cat_type: str):
+    market_data = get_market_data()
+    prices = market_data["prices"]
+    
+    # normalize input
+    cat_key = None
+    for k in prices.keys():
+        if k.lower() == cat_type.lower():
+            cat_key = k
+            break
+            
+    if not cat_key:
+        await interaction.response.send_message("we dont sell that here", ephemeral=True)
+        return
+        
+    user = await Profile.get_or_create(guild_id=interaction.guild.id, user_id=interaction.user.id)
+    
+    if user[f"cat_{cat_key}"] <= 0:
+        await interaction.response.send_message(f"you dont even have that cat. scammer.", ephemeral=True)
+        return
+
+    price = prices[cat_key]
+    
+    # transaction
+    user.roulette_balance += price
+    user[f"cat_{cat_key}"] -= 1
+    await user.save()
+    
+    emoji = get_emoji(cat_key.lower() + "cat")
+    embed = discord.Embed(
+        title="Market Sale",
+        description=f"sold {emoji} **{cat_key}** for **${price:,}**. stonks.",
+        color=Colors.green
+    )
+    embed.set_footer(text=f"new balance: ${user.roulette_balance:,}")
+    await interaction.response.send_message(embed=embed)
 
 
 @bot.tree.command(description="Learn to use the bot")
