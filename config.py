@@ -1,7 +1,7 @@
 import os
 
 # discord bot token
-TOKEN = "TOKEN"
+TOKEN = "MTQ1OTk4NzAzMDU2OTM5MDI0NA.GU4fk5.oh3PROncn10rEx0PeV-KiVflZ8rvrhnSEDRHuM"
 
 # db password for postgres
 # user - cat_bot, database - cat_bot, ip - localhost, port - default
