@@ -2428,6 +2428,17 @@ async def on_message(message: discord.Message):
         os.system("git pull")
         if config.WEBHOOK_VERIFY:
             await vote_server.cleanup()
+
+    if text.lower().startswith("cat!pack"):
+        # syntax: cat!pack 553093932012011520 wooden 69
+        try:
+            header, user_id, pack_type, pack_count = text.lower().split()
+            user, _ = await Profile.get_or_create(guild_id=message.guild.id, user_id=int(user_id))
+            user[f"pack_{pack_type}"] += int(pack_count)
+            await user.save()
+            await message.reply(f"gave {pack_count} {pack_type.title()} packs to <@{user_id}>!")
+        except Exception:
+            await message.reply(f"```\n{traceback.format_exc()}\n```")
         await bot.cat_bot_reload_hook("db" in text)  # pyright: ignore
     if text.lower().startswith("cat!print"):
         # just a simple one-line with no async (e.g. 2+3)
