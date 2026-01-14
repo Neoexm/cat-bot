@@ -2433,7 +2433,7 @@ async def on_message(message: discord.Message):
         # syntax: cat!pack 553093932012011520 wooden 69
         try:
             header, user_id, pack_type, pack_count = text.lower().split()
-            user, _ = await Profile.get_or_create(guild_id=message.guild.id, user_id=int(user_id))
+            user = await Profile.get_or_create(guild_id=message.guild.id, user_id=int(user_id))
             user[f"pack_{pack_type}"] += int(pack_count)
             await user.save()
             await message.reply(f"gave {pack_count} {pack_type.title()} packs to <@{user_id}>!")
