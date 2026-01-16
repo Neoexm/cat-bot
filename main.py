@@ -2407,26 +2407,31 @@ async def on_message(message: discord.Message):
     if text.lower().startswith("cat!rain"):
         # syntax: cat!rain 553093932012011520 short
         try:
-            things = text.split()
+            things = text.lower().split()
             user = await User.get_or_create(user_id=int(things[1]))
             if not user.rain_minutes:
                 user.rain_minutes = 0
             
+            action = "added"
             amount = 0
             if things[2] == "short":
                 amount = 2
+                user.rain_minutes += amount
             elif things[2] == "medium":
                 amount = 10
+                user.rain_minutes += amount
             elif things[2] == "long":
                 amount = 20
+                user.rain_minutes += amount
             else:
                 amount = int(things[2])
+                user.rain_minutes = amount
+                action = "set"
 
-            user.rain_minutes += amount
             user.premium = True
             await user.save()
-            print(f"ADMIN: Gave {amount} minutes of rain to {things[1]}")
-            await message.reply(f"gave {amount} minutes of rain to <@{things[1]}>")
+            print(f"ADMIN: {action.title()} rain to {amount} for {things[1]}")
+            await message.reply(f"{action} {amount} minutes of rain for <@{things[1]}>")
         except Exception:
             await message.reply(f"```\n{traceback.format_exc()}\n```")
     if text.lower().startswith("cat!restart"):
