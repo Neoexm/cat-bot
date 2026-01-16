@@ -1003,7 +1003,7 @@ async def maintaince_loop():
     reactions_ratelimit = {}
     catchcooldown = {}
     fakecooldown = {}
-    await bot.change_presence(activity=discord.CustomActivity(name=f"Catting in {len(bot.guilds):,} servers"))
+    await bot.change_presence(activity=discord.CustomActivity(name=f"Catting in 170,000 servers"))
 
     # update cookies
     temp_temp_cookie_storage = temp_cookie_storage.copy()
@@ -2566,7 +2566,7 @@ async def on_guild_join(guild):
 
     # you are free to change/remove this, its just a note for general user letting them know
     unofficial_note = "**NOTE: This is an unofficial Cat Bot instance.**\n\n"
-    if not bot.user or bot.user.id == 966695034340663367:
+    if not bot.user or bot.user.id == 1459987030569390244:
         unofficial_note = ""
     try:
         if ch.permissions_for(guild.me).send_messages:
