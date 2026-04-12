@@ -40,7 +40,7 @@ DONOR_CHANNEL_ID = 1249343008890028144
 
 # cat bot will also log all rain uses/movements here
 # cat!rain commands here can be used without author check and will dm reciever a thanks message
-RAIN_CHANNEL_ID = 1278705994536321157
+RAIN_CHANNEL_ID = 1492635229846765620
 
 # stores channels where fake egirl command was used: {channel_id: message_id}
 fake_egirl_storage = {}
