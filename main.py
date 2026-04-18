@@ -4540,7 +4540,7 @@ async def packs(message: discord.Interaction):
                 final_result = "\n\n" + final_result
             
             embed = discord.Embed(title=final_header, description=f"{pack_list}{final_result}", color=Colors.brown)
-            await message.edit_original_response(embed=None, view=gen_view(user))
+            await pack_msg.edit(view=gen_view(user))
             await interaction.followup.send(embed=embed)
 
         modal = Modal(title="Open Custom Amount")
@@ -4682,13 +4682,13 @@ async def packs(message: discord.Interaction):
         await user.save()
 
         embed = discord.Embed(title=reward_texts[0], color=Colors.brown)
-        followup_msg = await interaction.followup.send(embed=embed, wait=True)
-        await message.edit_original_response(view=gen_view(user))
+        result_msg = await interaction.channel.send(embed=embed)
+        await pack_msg.edit(view=gen_view(user))
         for reward_text in reward_texts[1:]:
             await asyncio.sleep(1)
             things = reward_text.split("\n", 1)
             embed = discord.Embed(title=things[0], description=things[1], color=Colors.brown)
-            await followup_msg.edit(embed=embed)
+            await result_msg.edit(embed=embed)
 
     async def open_all_packs(interaction: discord.Interaction):
         if interaction.user != message.user:
@@ -4744,16 +4744,21 @@ async def packs(message: discord.Interaction):
             final_result = "\n".join(half_result)
 
         embed = discord.Embed(title=final_header, description=pack_list, color=Colors.brown)
-        followup_msg = await interaction.followup.send(embed=embed, wait=True)
-        await message.edit_original_response(view=gen_view(user))
+        result_msg = await interaction.channel.send(embed=embed)
+        await pack_msg.edit(view=gen_view(user))
         await asyncio.sleep(1)
         embed = discord.Embed(title=final_header, description=pack_list + "\n\n" + final_result, color=Colors.brown)
-        await followup_msg.edit(embed=embed)
+        await result_msg.edit(embed=embed)
 
     description = "Each pack starts at one of eight tiers of increasing value - Wooden, Stone, Bronze, Silver, Gold, Platinum, Diamond, or Celestial - and can repeatedly move up tiers with a 30% chance per upgrade. This means that even a pack starting at Wooden, through successive upgrades, can reach the Celestial tier.\n[Chance Info](<https://catbot.minkos.lol/packs>)\n\nClick the buttons below to start opening packs!"
     embed = discord.Embed(title=f"{get_emoji('bronzepack')} Packs", description=description, color=Colors.brown)
     user = await Profile.get_or_create(guild_id=message.guild.id, user_id=message.user.id)
-    await message.response.send_message(embed=embed, view=gen_view(user))
+    await message.response.defer(ephemeral=True)
+    pack_msg = await message.channel.send(embed=embed, view=gen_view(user))
+    try:
+        await message.delete_original_response()
+    except Exception:
+        pass
 
 
 @bot.tree.command(description="why would anyone think a cattlepass would be a good idea")
