@@ -380,7 +380,7 @@ emojis = {}
 RAIN_ID = 1270470307102195752
 
 # for dev commands, this is fetched in on_ready
-OWNER_ID = 553093932012011520
+OWNER_ID = 1242057994045231144
 
 # for funny stats, you can probably edit maintaince_loop to restart every X of them
 loop_count = 0
@@ -1243,10 +1243,10 @@ async def on_ready():
     print("cat is now online")
     emojis = {emoji.name: str(emoji) for emoji in await bot.fetch_application_emojis()}
     appinfo = bot.application
-    if appinfo.team and appinfo.team.owner_id:
-        OWNER_ID = appinfo.team.owner_id
-    else:
-        OWNER_ID = appinfo.owner.id
+    # if appinfo.team and appinfo.team.owner_id:
+    #     OWNER_ID = appinfo.team.owner_id
+    # else:
+    #     OWNER_ID = appinfo.owner.id
 
     testers = [
         712639066373619754,
