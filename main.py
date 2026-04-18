@@ -4682,14 +4682,13 @@ async def packs(message: discord.Interaction):
         await user.save()
 
         embed = discord.Embed(title=reward_texts[0], color=Colors.brown)
-        await interaction.edit_original_response(embed=embed, view=None)
+        followup_msg = await interaction.followup.send(embed=embed, wait=True)
+        await message.edit_original_response(view=gen_view(user))
         for reward_text in reward_texts[1:]:
             await asyncio.sleep(1)
             things = reward_text.split("\n", 1)
             embed = discord.Embed(title=things[0], description=things[1], color=Colors.brown)
-            await interaction.edit_original_response(embed=embed)
-        await asyncio.sleep(1)
-        await interaction.edit_original_response(view=gen_view(user))
+            await followup_msg.edit(embed=embed)
 
     async def open_all_packs(interaction: discord.Interaction):
         if interaction.user != message.user:
@@ -4745,12 +4744,11 @@ async def packs(message: discord.Interaction):
             final_result = "\n".join(half_result)
 
         embed = discord.Embed(title=final_header, description=pack_list, color=Colors.brown)
-        await interaction.edit_original_response(embed=embed, view=None)
+        followup_msg = await interaction.followup.send(embed=embed, wait=True)
+        await message.edit_original_response(view=gen_view(user))
         await asyncio.sleep(1)
         embed = discord.Embed(title=final_header, description=pack_list + "\n\n" + final_result, color=Colors.brown)
-        await interaction.edit_original_response(embed=embed)
-        await asyncio.sleep(1)
-        await interaction.edit_original_response(view=gen_view(user))
+        await followup_msg.edit(embed=embed)
 
     description = "Each pack starts at one of eight tiers of increasing value - Wooden, Stone, Bronze, Silver, Gold, Platinum, Diamond, or Celestial - and can repeatedly move up tiers with a 30% chance per upgrade. This means that even a pack starting at Wooden, through successive upgrades, can reach the Celestial tier.\n[Chance Info](<https://catbot.minkos.lol/packs>)\n\nClick the buttons below to start opening packs!"
     embed = discord.Embed(title=f"{get_emoji('bronzepack')} Packs", description=description, color=Colors.brown)
