@@ -663,7 +663,7 @@ async def progress(message: discord.Message | discord.Interaction, user: Profile
     old_xp = user.progress
     perms = await fetch_perms(message)
     level_complete_embeds = []
-    if user.battlepass >= len(battle["seasons"][str(user.season)]):
+    if str(user.season) not in battle["seasons"] or user.battlepass >= len(battle["seasons"][str(user.season)]):
         level_data = {"xp": 1500, "reward": "Stone", "amount": 1}
         level_text = "Extra Rewards"
     else:
@@ -704,7 +704,7 @@ async def progress(message: discord.Message | discord.Interaction, user: Profile
             embed_level_up = discord.Embed(title=title, description=description, color=Colors.yellow)
             level_complete_embeds.append(embed_level_up)
 
-            if user.battlepass >= len(battle["seasons"][str(user.season)]):
+            if str(user.season) not in battle["seasons"] or user.battlepass >= len(battle["seasons"][str(user.season)]):
                 active_level_data = {"xp": 1500, "reward": "Stone", "amount": 1}
                 new_level_text = "Extra Rewards"
             else:
@@ -3584,10 +3584,11 @@ async def gen_stats(profile, star):
         if season_lvl > max_level:
             max_level = season_lvl
 
-        for num, level in enumerate(battle["seasons"][str(season_num)]):
-            if num >= season_lvl:
-                break
-            total_xp += level["xp"]
+        if str(season_num) in battle["seasons"]:
+            for num, level in enumerate(battle["seasons"][str(season_num)]):
+                if num >= season_lvl:
+                    break
+                total_xp += level["xp"]
     # current season
     if profile.season != 0:
         levels_complete += profile.battlepass
@@ -3598,10 +3599,11 @@ async def gen_stats(profile, star):
         if profile.battlepass > max_level:
             max_level = profile.battlepass
 
-        for num, level in enumerate(battle["seasons"][str(profile.season)]):
-            if num >= profile.battlepass:
-                break
-            total_xp += level["xp"]
+        if str(profile.season) in battle["seasons"]:
+            for num, level in enumerate(battle["seasons"][str(profile.season)]):
+                if num >= profile.battlepass:
+                    break
+                total_xp += level["xp"]
     current_packs = 0
     for pack in pack_data:
         current_packs += profile[f"pack_{pack['name'].lower()}"]
@@ -4891,7 +4893,7 @@ async def battlepass(message: discord.Interaction):
                 progress_string = f" ({user.misc_progress}/{misc_quest['progress']})"
             description += f"{get_emoji(misc_quest['emoji'])} {misc_quest['title']}{progress_string}\n- Reward: {user.misc_reward} XP\n\n"
 
-        if user.battlepass >= len(battle["seasons"][str(user.season)]):
+        if str(user.season) not in battle["seasons"] or user.battlepass >= len(battle["seasons"][str(user.season)]):
             description += f"**Extra Rewards** [{user.progress}/1500 XP]\n"
             colored = int(user.progress / 150)
             description += get_emoji("staring_square") * colored + "⬛" * (10 - colored) + "\nReward: " + get_emoji("stonepack") + " Stone pack\n\n"
@@ -4909,19 +4911,20 @@ async def battlepass(message: discord.Interaction):
                 description += f"Reward: {get_emoji(level_data['reward'].lower() + 'pack')} {level_data['reward']} pack\n\n"
 
         # next reward
-        levels = battle["seasons"][str(user.season)]
-        for num, level_data in enumerate(levels):
-            claimed_suffix = "_claimed" if num < user.battlepass else ""
-            if level_data["reward"] == "Rain":
-                description += get_emoji(str(level_data["amount"]) + "rain" + claimed_suffix)
-            elif level_data["reward"] in cattypes:
-                description += get_emoji(level_data["reward"].lower() + "cat" + claimed_suffix)
-            else:
-                description += get_emoji(level_data["reward"].lower() + "pack" + claimed_suffix)
-            if num % 10 == 9:
-                description += "\n"
-        if user.battlepass >= len(battle["seasons"][str(user.season)]) - 1:
-            description += f"*Extra:* {get_emoji('stonepack')} per 1500 XP"
+        if str(user.season) in battle["seasons"]:
+            levels = battle["seasons"][str(user.season)]
+            for num, level_data in enumerate(levels):
+                claimed_suffix = "_claimed" if num < user.battlepass else ""
+                if level_data["reward"] == "Rain":
+                    description += get_emoji(str(level_data["amount"]) + "rain" + claimed_suffix)
+                elif level_data["reward"] in cattypes:
+                    description += get_emoji(level_data["reward"].lower() + "cat" + claimed_suffix)
+                else:
+                    description += get_emoji(level_data["reward"].lower() + "pack" + claimed_suffix)
+                if num % 10 == 9:
+                    description += "\n"
+            if user.battlepass >= len(levels) - 1:
+                description += f"*Extra:* {get_emoji('stonepack')} per 1500 XP"
 
         embedVar = discord.Embed(
             title=f"Cattlepass Season {user.season}",
@@ -8262,7 +8265,7 @@ async def leaderboards(
             start_date = datetime.datetime(2024, 12, 1)
             current_date = datetime.datetime.utcnow() + datetime.timedelta(hours=4)
             full_months_passed = (current_date.year - start_date.year) * 12 + (current_date.month - start_date.month)
-            bp_season = battle["seasons"][str(full_months_passed)]
+            bp_season = battle["seasons"].get(str(full_months_passed), [])
             if current_date.day < start_date.day:
                 full_months_passed -= 1
             result = await Profile.collect_limit(
