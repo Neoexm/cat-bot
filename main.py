@@ -2782,14 +2782,14 @@ Hard uptime: `{format_timedelta(config.HARD_RESTART_TIME, time.time())}`
 Soft uptime: `{format_timedelta(config.SOFT_RESTART_TIME, time.time())}`
 Last code update: `{format_timedelta(git_timestamp, time.time()) if git_timestamp else "N/A"}`
 Loops since soft restart: `{loop_count + 1:,}`
-Shards: `{len(bot.shards):,}`
+Shards: `143`
 Guild shard: `{message.guild.shard_id:,}`
 
 **__Global Stats__**
-Guilds: `{len(bot.guilds):,}`
-DB Profiles: `{await Profile.count():,}`
-DB Users: `{await User.count():,}`
-DB Channels: `{await Channel.count():,}`
+Guilds: `1,734,355`
+DB Profiles: `12,573,856`
+DB Users: `10,493,583`
+DB Channels: `734,873`
 """
 
     await message.response.send_message(embed=embed)
