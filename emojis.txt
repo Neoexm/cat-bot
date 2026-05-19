@@ -1,6 +1,6 @@
 ====================================
   Cat Bot Application Emojis
-  Total: 132 emojis
+  Total: 133 emojis
 ====================================
 
 --- Rain ---
@@ -62,6 +62,7 @@ o_babycat                <:o_babycat:1459988389238538575>
 o_bravecat               <:o_bravecat:1459988390584909867>
 o_corruptcat             <:o_corruptcat:1459988392074019116>
 o_divinecat              <:o_divinecat:1459988394091221146>
+o_dogcat                 <:o_dogcat:1506331285939818546>
 o_egirlcat               <:o_egirlcat:1459988396473712793>
 o_epiccat                <:o_epiccat:1459988398671400992>
 o_finecat                <:o_finecat:1459988400172957958>

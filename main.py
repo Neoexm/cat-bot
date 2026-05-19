@@ -81,10 +81,12 @@ type_dict = {
     "Real": 5,
     "Ultimate": 3,
     "eGirl": 2,
+    "Dog": 0.1,
 }
 
 # this list stores unique non-duplicate cattypes
 cattypes = list(type_dict.keys())
+normal_cattypes = cattypes[:-1]
 
 # generate a dict with lowercase'd keys
 cattype_lc_dict = {i.lower(): i for i in cattypes}
@@ -393,6 +395,10 @@ def get_emoji(name):
     global emojis
     if name in emojis.keys():
         return emojis[name]
+    elif name == "dogcat":
+        if "o_dogcat" in emojis.keys():
+            return emojis["o_dogcat"]
+        return "<:o_dogcat:1506331285939818546>"
     elif name in emoji.EMOJI_DATA:
         return name
     else:
@@ -2169,6 +2175,7 @@ async def on_message(message: discord.Message):
                 custom_cough_strings = {
                     "Corrupt": "{username} coought{type} c{emoji}at!!!!404!\nYou now BEEP {count} cats of dCORRUPTED!!\nthis fella wa- {time}!!!!",
                     "eGirl": "{username} cowought {emoji} {type} cat~~ ^^\nYou-u now *blushes* hawe {count} cats of dat tywe~!!!\nthis fella was <3 cought in {time}!!!!",
+                    "Dog": "{username} cought {emoji} {type} cat!!!!1!\nYou now have {count} dogs legally classified as cats!!!\nthis fella was cought in {time}!!!! bark mrrp",
                     "Rickroll": "{username} cought {emoji} {type} cat!!!!1!\nYou will never give up {count} cats of dat type!!!\nYou wouldn't let them down even after {time}!!!!",
                     "Sus": "{username} cought {emoji} {type} cat!!!!1!\nYou have vented infront of {count} cats of dat type!!!\nthis sussy baka was cought in {time}!!!!",
                     "Professor": "{username} caught {emoji} {type} cat!\nThou now hast {count} cats of that type!\nThis fellow was caught 'i {time}!",
@@ -3775,7 +3782,8 @@ async def gen_inventory(message, person_id):
             valuenum += (sum(type_dict.values()) / type_dict[i]) * cat_num
             cat_desc += f"{icon} **{i}** {cat_num:,}\n"
         else:
-            give_collector = False
+            if i in normal_cattypes:
+                give_collector = False
 
     if user.custom:
         icon = get_emoji(str(user.user_id) + "cat")
@@ -4621,7 +4629,7 @@ async def packs(message: discord.Interaction):
 
         # select cat type
         goal_value = final_level["value"]
-        chosen_type = random.choice(cattypes)
+        chosen_type = random.choice(normal_cattypes)
         cat_emoji = get_emoji(chosen_type.lower() + "cat")
         pre_cat_amount = goal_value / (sum(type_dict.values()) / type_dict[chosen_type])
         if pre_cat_amount % 1 > random.random():
@@ -5000,7 +5008,7 @@ async def prism(message: discord.Interaction, person: Optional[discord.User]):
         user = await Profile.get_or_create(guild_id=interaction.guild.id, user_id=interaction.user.id)
 
         # check we still can craft
-        for i in cattypes:
+        for i in normal_cattypes:
             if user["cat_" + i] < 1:
                 await interaction.followup.send("You don't have enough cats. Nice try though.", ephemeral=True)
                 return
@@ -5021,7 +5029,7 @@ async def prism(message: discord.Interaction, person: Optional[discord.User]):
             selected_time = round(time.time())
 
         # actually take away cats
-        for i in cattypes:
+        for i in normal_cattypes:
             user["cat_" + i] -= 1
         await user.save()
 
@@ -5042,7 +5050,7 @@ async def prism(message: discord.Interaction, person: Optional[discord.User]):
 
         found_cats = await cats_in_server(interaction.guild.id)
         missing_cats = []
-        for i in cattypes:
+        for i in normal_cattypes:
             if user[f"cat_{i}"] > 0:
                 continue
             if i in found_cats:
@@ -5054,11 +5062,11 @@ async def prism(message: discord.Interaction, person: Optional[discord.User]):
             view = View(timeout=VIEW_TIMEOUT)
             confirm_button = Button(label="Craft!", style=ButtonStyle.blurple, emoji=icon)
             confirm_button.callback = confirm_craft
-            description = "The crafting recipe is __ONE of EVERY cat type__.\nContinue crafting?"
+            description = "The crafting recipe is __ONE of EVERY cat type__ (except Dog).\nContinue crafting?"
         else:
             view = View(timeout=VIEW_TIMEOUT)
             confirm_button = Button(label="Not enough cats!", style=ButtonStyle.red, disabled=True)
-            description = "The crafting recipe is __ONE of EVERY cat type__.\nYou are missing " + "".join(missing_cats)
+            description = "The crafting recipe is __ONE of EVERY cat type__ (except Dog).\nYou are missing " + "".join(missing_cats)
 
         view.add_item(confirm_button)
         await interaction.response.send_message(description, view=view, ephemeral=True)
@@ -7004,7 +7012,7 @@ async def bounty(message, user, cattype):
                         complete += 1
                         title.append(f"Catch {total} {type} cats")
             if id == 2:
-                if cattypes.index(cattype) >= cattypes.index(type):
+                if cattype in normal_cattypes and normal_cattypes.index(cattype) >= normal_cattypes.index(type):
                     progress += 1
                     if progress == total:
                         complete += 1
@@ -7034,7 +7042,7 @@ async def bounty(message, user, cattype):
                     user.bounty_progress_bonus += 1
                 bonus_title = f"Catch {user.bounty_total_bonus} {cattype} cats"
             else:
-                if cattypes.index(cattype) >= cattypes.index(user.bounty_type_bonus):
+                if cattype in normal_cattypes and normal_cattypes.index(cattype) >= normal_cattypes.index(user.bounty_type_bonus):
                     user.bounty_progress_bonus += 1
                 bonus_title = f"Catch {user.bounty_total_bonus} {user.bounty_type_bonus} or rarer cats"
             if user.bounty_progress_bonus == user.bounty_total_bonus:
@@ -7073,7 +7081,7 @@ async def set_mafia_offer(level, user):
     vt = level_data["cost"]
     cattype = "Fine"
     for _ in range(100):
-        cattype = random.choice(cattypes)
+        cattype = random.choice(normal_cattypes)
         value = sum(type_dict.values()) / type_dict[cattype]
         if value <= vt:
             break
@@ -7143,11 +7151,11 @@ async def get_bounties(level):
                 variation *= 10
         if bounty_type == "rarity":
             margin = 0.2
-            rarity_i = random.randint(2, len(cattypes) - 2)
+            rarity_i = random.randint(2, len(normal_cattypes) - 2)
 
             while True:
-                rarity = cattypes[rarity_i]
-                eligible_types = cattypes[rarity_i:]
+                rarity = normal_cattypes[rarity_i]
+                eligible_types = normal_cattypes[rarity_i:]
 
                 prob = sum(type_dict[t] for t in eligible_types) / sum(type_dict.values())
                 base_amount = max(1, round(avg_cats_needed * prob))
@@ -7179,7 +7187,7 @@ async def get_bounties(level):
             bounties.append({"id": 0, "progress": 0, "cat_type": "", "amount": amount, "desc": f"Catch {amount} cats of any kind"})
         else:
             # pick a specific cat type not already used
-            available_types = [cat for cat in cattypes if cat not in used_types]
+            available_types = [cat for cat in normal_cattypes if cat not in used_types]
             if not available_types:
                 continue
 
