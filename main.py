@@ -81,10 +81,12 @@ type_dict = {
     "Real": 5,
     "Ultimate": 3,
     "eGirl": 2,
+    "Dog": 0.1,
 }
 
 # this list stores unique non-duplicate cattypes
 cattypes = list(type_dict.keys())
+normal_cattypes = cattypes[:-1]
 
 # generate a dict with lowercase'd keys
 cattype_lc_dict = {i.lower(): i for i in cattypes}
@@ -2300,6 +2302,7 @@ async def on_message(message: discord.Message):
                 custom_cough_strings = {
                     "Corrupt": "{username} coought{type} c{emoji}at!!!!404!\nYou now BEEP {count} cats of dCORRUPTED!!\nthis fella wa- {time}!!!!",
                     "eGirl": "{username} cowought {emoji} {type} cat~~ ^^\nYou-u now *blushes* hawe {count} cats of dat tywe~!!!\nthis fella was <3 cought in {time}!!!!",
+                    "Dog": "{username} cought {emoji} {type} cat!!!!1!\nYou now have {count} dogs legally classified as cats!!!\nthis fella was cought in {time}!!!! bark mrrp",
                     "Rickroll": "{username} cought {emoji} {type} cat!!!!1!\nYou will never give up {count} cats of dat type!!!\nYou wouldn't let them down even after {time}!!!!",
                     "Sus": "{username} cought {emoji} {type} cat!!!!1!\nYou have vented infront of {count} cats of dat type!!!\nthis sussy baka was cought in {time}!!!!",
                     "Professor": "{username} caught {emoji} {type} cat!\nThou now hast {count} cats of that type!\nThis fellow was caught 'i {time}!",
@@ -2414,7 +2417,26 @@ async def on_message(message: discord.Message):
                         # Silently fail if we can't send the confirmation message (e.g. permission issues)
                         pass
 
+                # Check for fake egirl hijack
+                is_fake_egirl = False
+                if message.channel.id in config.fake_egirl_storage and config.fake_egirl_storage[message.channel.id] == cat_temp:
+                    is_fake_egirl = True
+                    del config.fake_egirl_storage[message.channel.id]
+
                 await asyncio.gather(delete_cat(), send_confirm())
+
+                if is_fake_egirl:
+                    async def troll_user():
+                        def check(m):
+                            return m.author.id == message.author.id and m.channel.id == message.channel.id
+
+                        try:
+                            await bot.wait_for("message", check=check, timeout=300)
+                            await message.channel.send("haha get trolled")
+                        except asyncio.TimeoutError:
+                            pass
+
+                    bot.loop.create_task(troll_user())
 
                 logging.debug("Caught (pre-boost) %d %s", 1, channel.cattype)
                 logging.debug("Caught (post-boost) %d %s", silly_amount, le_emoji)
@@ -3970,7 +3992,7 @@ async def gen_inventory(message, person_id):
             total += cat_num
             valuenum += (sum(type_dict.values()) / type_dict[i]) * cat_num
             cat_desc += f"{icon} **{i}** {cat_num:,}\n"
-        else:
+        elif i in normal_cattypes:
             give_collector = False
 
     if user.custom:
@@ -4848,7 +4870,7 @@ async def packs(message: discord.Interaction):
 
         # select cat type
         goal_value = final_level["value"]
-        chosen_type = random.choice(cattypes)
+        chosen_type = random.choice(normal_cattypes)
         cat_emoji = get_emoji(chosen_type.lower() + "cat")
         pre_cat_amount = goal_value / (sum(type_dict.values()) / type_dict[chosen_type])
         if pre_cat_amount % 1 > random.random():
@@ -5177,7 +5199,7 @@ async def prism(message: discord.Interaction, person: Optional[discord.User]):
         user = await Profile.get_or_create(guild_id=interaction.guild.id, user_id=interaction.user.id)
 
         # check we still can craft
-        for i in cattypes:
+        for i in normal_cattypes:
             if user["cat_" + i] < 1:
                 await interaction.followup.send("You don't have enough cats. Nice try though.", ephemeral=True)
                 return
@@ -5202,7 +5224,7 @@ async def prism(message: discord.Interaction, person: Optional[discord.User]):
             selected_time = round(time.time())
 
         # actually take away cats
-        for i in cattypes:
+        for i in normal_cattypes:
             user["cat_" + i] -= 1
         await user.save()
 
@@ -5227,7 +5249,7 @@ async def prism(message: discord.Interaction, person: Optional[discord.User]):
         found_cats = await cats_in_server(interaction.guild.id)
         missing_cats = []
         unknowns = 0
-        for i in cattypes:
+        for i in normal_cattypes:
             if user[f"cat_{i}"] > 0:
                 continue
             if i in found_cats:
@@ -5243,11 +5265,11 @@ async def prism(message: discord.Interaction, person: Optional[discord.User]):
             view = View(timeout=VIEW_TIMEOUT)
             confirm_button = Button(label="Craft!", style=ButtonStyle.blurple, emoji=icon)
             confirm_button.callback = confirm_craft
-            description = "The crafting recipe is __ONE of EVERY cat type__.\nContinue crafting?"
+            description = "The crafting recipe is __ONE of EVERY cat type__ (except Dog).\nContinue crafting?"
         else:
             view = View(timeout=VIEW_TIMEOUT)
             confirm_button = Button(label="Not enough cats!", style=ButtonStyle.red, disabled=True)
-            description = "The crafting recipe is __ONE of EVERY cat type__.\nYou are missing " + "".join(missing_cats) + unknown_suffix
+            description = "The crafting recipe is __ONE of EVERY cat type__ (except Dog).\nYou are missing " + "".join(missing_cats) + unknown_suffix
 
         view.add_item(confirm_button)
         await interaction.response.send_message(description, view=view, ephemeral=True)
@@ -7272,7 +7294,7 @@ def _bounty_matches(bid, btype, cattype):
     elif bid == 1:
         return cattype == btype
     else:
-        return cattypes.index(cattype) >= cattypes.index(btype)
+        return cattype in normal_cattypes and normal_cattypes.index(cattype) >= normal_cattypes.index(btype)
 
 
 async def bounty(message, user, cattype):
@@ -7349,7 +7371,7 @@ async def set_mafia_offer(level, user):
     vt = level_data["cost"]
     cattype = "Fine"
     for _ in range(100):
-        cattype = random.choice(cattypes)
+        cattype = random.choice(normal_cattypes)
         value = sum(type_dict.values()) / type_dict[cattype]
         if value <= vt:
             break
@@ -7419,11 +7441,11 @@ async def get_bounties(level):
                 variation *= 10
         if bounty_type == "rarity":
             margin = 0.2
-            rarity_i = random.randint(2, len(cattypes) - 2)
+            rarity_i = random.randint(2, len(normal_cattypes) - 2)
 
             while True:
-                rarity = cattypes[rarity_i]
-                eligible_types = cattypes[rarity_i:]
+                rarity = normal_cattypes[rarity_i]
+                eligible_types = normal_cattypes[rarity_i:]
 
                 prob = sum(type_dict[t] for t in eligible_types) / sum(type_dict.values())
                 base_amount = max(1, round(avg_cats_needed * prob))
@@ -7455,7 +7477,7 @@ async def get_bounties(level):
             bounties.append({"id": 0, "progress": 0, "cat_type": "", "amount": amount, "desc": f"Catch {amount} cats of any kind"})
         else:
             # pick a specific cat type not already used
-            available_types = [cat for cat in cattypes if cat not in used_types]
+            available_types = [cat for cat in normal_cattypes if cat not in used_types]
             if not available_types:
                 continue
 
@@ -9180,6 +9202,42 @@ async def check_supporter(request):
 
     user = await User.get_or_create(user_id=int(request_json["user"]))
     return web.Response(text="1" if user.premium else "0", status=200)
+
+
+@bot.tree.command(description="(ADMIN) Fake spawn an egirl cat")
+@discord.app_commands.default_permissions(manage_guild=True)
+@discord.app_commands.describe(channel="The channel to send the message in")
+async def fake_egirl(interaction: discord.Interaction, channel: discord.TextChannel):
+    db_channel = await Channel.get_or_none(channel_id=channel.id)
+
+    if not db_channel or db_channel.cat == 0:
+        await interaction.response.send_message("No cat is currently spawned in that channel.", ephemeral=True)
+        return
+
+    try:
+        old_msg = await channel.fetch_message(db_channel.cat)
+        await old_msg.delete()
+    except discord.NotFound:
+        pass
+    except Exception as e:
+        await interaction.response.send_message(f"Error deleting old message: {e}", ephemeral=True)
+        return
+
+    localcat = "eGirl"
+    icon = get_emoji(localcat.lower() + "cat")
+    file = discord.File(f"images/spawn/{localcat.lower()}_cat.png")
+
+    appearstring = '{emoji} {type} cat has appeared! Type "cat" to catch it!'
+    content = appearstring.replace("{emoji}", str(icon)).replace("{type}", localcat)
+
+    new_msg = await channel.send(content, file=file, allowed_mentions=discord.AllowedMentions.all())
+
+    db_channel.cat = new_msg.id
+    await db_channel.save()
+
+    config.fake_egirl_storage[channel.id] = new_msg.id
+
+    await interaction.response.send_message(f"Fake egirl cat sent to {channel.mention} (hijacked)", ephemeral=True)
 
 
 async def bake_gg_reward(request):
