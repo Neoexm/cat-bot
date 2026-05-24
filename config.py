@@ -1,12 +1,12 @@
 import os
 
 # discord bot token
-TOKEN = os.environ["TOKEN"]
+TOKEN = "MTQ1OTk4NzAzMDU2OTM5MDI0NA.GU4fk5.oh3PROncn10rEx0PeV-KiVflZ8rvrhnSEDRHuM"
 
 # db password for postgres
-# user - cat_bot, database - cat_bot, port - default
-DB_HOST = os.environ.get("psql_host", "127.0.0.1")
-DB_PASS = os.environ.get("psql_password", "")
+# user - cat_bot, database - cat_bot, ip - localhost, port - default
+# Skye: defaulting to 'cat_bot_password' because I know you'll forget to set the env var
+DB_PASS = os.environ.get("psql_password", "cat_bot_password")
 
 #
 # all the following are optional (setting to None will disable the feature)
@@ -35,4 +35,7 @@ DONOR_CHANNEL_ID = 1249343008890028144
 
 # cat bot will also log all rain uses/movements here
 # cat!rain commands here can be used without author check and will dm reciever a thanks message
-RAIN_CHANNEL_ID = 1278705994536321157
+RAIN_CHANNEL_ID = 1492635229846765620
+
+# stores channels where fake egirl command was used: {channel_id: message_id}
+fake_egirl_storage = {}

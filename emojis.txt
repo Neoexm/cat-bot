@@ -1,0 +1,157 @@
+====================================
+  Cat Bot Application Emojis
+  Total: 133 emojis
+====================================
+
+--- Rain ---
+2rain                    <:2rain:1459987926115946654>
+2rain_claimed            <:2rain_claimed:1459987927487611032>
+
+--- Cat Types (Standard) ---
+8bitcat                  <:8bitcat:1459988232732152019>
+babycat                  <:babycat:1459988235106255023>
+bravecat                 <:bravecat:1459988236616208659>
+corruptcat               <:corruptcat:1459988238235205864>
+divinecat                <:divinecat:1459988240206659697>
+egirlcat                 <:egirlcat:1459988242790224038>
+epiccat                  <:epiccat:1459988244644233464>
+finecat                  <:finecat:1459988246636265597>
+goodcat                  <:goodcat:1459988249043931388>
+legendarycat             <:legendarycat:1459988250302218271>
+mythiccat                <:mythiccat:1459988251376091331>
+nicecat                  <:nicecat:1459988252785381386>
+professorcat             <:professorcat:1459988254102257767>
+rarecat                  <:rarecat:1459988256178569287>
+realcat                  <:realcat:1459988257663094817>
+reversecat               <:reversecat:1459988258812592260>
+rickrollcat              <:rickrollcat:1459988261014474853>
+superiorcat              <:superiorcat:1459988261991878677>
+suscat                   <:suscat:1459988270300532941>
+trashcat                 <:trashcat:1459988272557330452>
+ultimatecat              <:ultimatecat:1459988274205692066>
+wildcat                  <:wildcat:1459988275807654111>
+mysterycat               <:mysterycat:1459987973838733685>
+
+--- Cat Types (b_ prefix) ---
+b_8bitcat                <:b_8bitcat:1459988139677323487>
+b_babycat                <:b_babycat:1459988141187530875>
+b_bravecat               <:b_bravecat:1459988142932103228>
+b_corruptcat             <:b_corruptcat:1459988152243589254>
+b_divinecat              <:b_divinecat:1459988154067976410>
+b_egirlcat               <:b_egirlcat:1459988156827828526>
+b_epiccat                <:b_epiccat:1459988158392439013>
+b_finecat                <:b_finecat:1459988160082739272>
+b_goodcat                <:b_goodcat:1459988168177877208>
+b_legendarycat           <:b_legendarycat:1459988170870489178>
+b_mythiccat              <:b_mythiccat:1459988172288163970>
+b_nicecat                <:b_nicecat:1459988173747781739>
+b_professorcat           <:b_professorcat:1459988175844802845>
+b_rarecat                <:b_rarecat:1459988177715724361>
+b_realcat                <:b_realcat:1459988179070357708>
+b_reversecat             <:b_reversecat:1459988186871759000>
+b_rickrollcat            <:b_rickrollcat:1459988188662861957>
+b_superiorcat            <:b_superiorcat:1459988191196221638>
+b_suscat                 <:b_suscat:1459988192509038602>
+b_trashcat               <:b_trashcat:1459988194748793075>
+b_ultimatecat            <:b_ultimatecat:1459988196355084358>
+b_wildcat                <:b_wildcat:1459988198112362557>
+
+--- Cat Types (o_ prefix) ---
+o_8bitcat                <:o_8bitcat:1459988387774857347>
+o_babycat                <:o_babycat:1459988389238538575>
+o_bravecat               <:o_bravecat:1459988390584909867>
+o_corruptcat             <:o_corruptcat:1459988392074019116>
+o_divinecat              <:o_divinecat:1459988394091221146>
+o_dogcat                 <:o_dogcat:1506331285939818546>
+o_egirlcat               <:o_egirlcat:1459988396473712793>
+o_epiccat                <:o_epiccat:1459988398671400992>
+o_finecat                <:o_finecat:1459988400172957958>
+o_goodcat                <:o_goodcat:1459988401754210438>
+o_legendarycat           <:o_legendarycat:1459988403197186203>
+o_mythiccat              <:o_mythiccat:1459988405042679868>
+o_nicecat                <:o_nicecat:1459988406644899901>
+o_professorcat           <:o_professorcat:1459988408221831329>
+o_rarecat                <:o_rarecat:1459988409429790760>
+o_realcat                <:o_realcat:1459988411027951793>
+o_reversecat             <:o_reversecat:1459988412521250929>
+o_rickrollcat            <:o_rickrollcat:1459988413850718249>
+o_superiorcat            <:o_superiorcat:1459988415301943442>
+o_suscat                 <:o_suscat:1459988416753307901>
+o_thetrashcellcat        <:o_thetrashcellcat:1459988418120388950>
+o_ultimatecat            <:o_ultimatecat:1459988419806494844>
+o_wildcat                <:o_wildcat:1459988421303865616>
+
+--- Cat Types (p_ prefix) ---
+p_8bitcat                <:p_8bitcat:1459988311790588109>
+p_babycat                <:p_babycat:1459988314202570812>
+p_bravecat               <:p_bravecat:1459988316161314837>
+p_corruptcat             <:p_corruptcat:1459988317415276667>
+p_divinecat              <:p_divinecat:1459988318526771211>
+p_egirlcat               <:p_egirlcat:1459988320582107330>
+p_epiccat                <:p_epiccat:1459988322003718359>
+p_finecat                <:p_finecat:1459988323392295124>
+p_goodcat                <:p_goodcat:1459988324537335931>
+p_legendarycat           <:p_legendarycat:1459988325673996485>
+p_mythiccat              <:p_mythiccat:1459988326999265475>
+p_nicecat                <:p_nicecat:1459988328966258698>
+p_professorcat           <:p_professorcat:1459988330132275350>
+p_rarecat                <:p_rarecat:1459988331793219778>
+p_realcat                <:p_realcat:1459988333533986847>
+p_reversecat             <:p_reversecat:1459988335270297764>
+p_rickrollcat            <:p_rickrollcat:1459988336742760589>
+p_superiorcat            <:p_superiorcat:1459988338407903385>
+p_suscat                 <:p_suscat:1459988340471234792>
+p_trashcat               <:p_trashcat:1459988343382343893>
+p_ultimatecat            <:p_ultimatecat:1459988344837771458>
+p_wildcat                <:p_wildcat:1459988346624409671>
+
+--- Packs ---
+bronzepack               <:bronzepack:1459987931640107152>
+bronzepack_claimed       <:bronzepack_claimed:1459987933120430080>
+celestialpack            <:celestialpack:1459987944759890113>
+celestialpack_claimed    <:celestialpack_claimed:1459987945988685979>
+christmaspack            <:christmaspack:1459987947595235361>
+diamondpack              <:diamondpack:1459987952171221166>
+diamondpack_claimed      <:diamondpack_claimed:1459987953722855464>
+goldpack                 <:goldpack:1459987959754395720>
+goldpack_claimed         <:goldpack_claimed:1459987962925416460>
+platinumpack             <:platinumpack:1459987980939952188>
+platinumpack_claimed     <:platinumpack_claimed:1459987983099760811>
+silverpack               <:silverpack:1459987991643685037>
+silverpack_claimed       <:silverpack_claimed:1459987992952312073>
+stonepack                <:stonepack:1459987998576738387>
+stonepack_claimed        <:stonepack_claimed:1459988001013891142>
+woodenpack               <:woodenpack:1459988015228387511>
+woodenpack_claimed       <:woodenpack_claimed:1459988019502125222>
+
+--- Rarities ---
+common                   <:common:1459987949046333440>
+uncommon                 <:uncommon:1459988004570665123>
+rare                     <:rare:1459987988959334482>
+epic                     <:epic:1459987957380288747>
+legendary                <:legendary:1459987972509139095>
+
+--- Achievements ---
+ach                      <:ach:1459987929492357192>
+demonic_ach              <:demonic_ach:1459987950606749868>
+no_ach                   <:no_ach:1459987975038566450>
+no_demonic_ach           <:no_demonic_ach:1459987977949155554>
+
+--- Misc ---
+birthday                 <:birthday:1459988199794413622>
+cat_cry                  <:cat_cry:1459987935959973950>
+catnip                   <:catnip:1459987937432305789>
+catnip_disabled          <:catnip_disabled:1459987943308660878>
+empty                    <:empty:1459987955375538375>
+jeremysus                <:jeremysus:1459987971141795982>
+piece                    <:piece:1459987979471687740>
+pointlaugh               <:pointlaugh:1459987985461149870>
+prism                    <:prism:1459987986912378901>
+sillycat                 <:sillycat:1459987990557495368>
+staring_cat              <:staring_cat:1459987995057721549>
+staring_square           <:staring_square:1459987997192880244>
+topgg                    <:topgg:1459988003131883611>
+why_v1                   <:why_v1:1459988012904481122>
+
+--- Animated ---
+vanish                   <a:vanish:1459988010954260492>

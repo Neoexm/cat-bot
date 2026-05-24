@@ -1,0 +1,1 @@
+ALTER TABLE public.profile ADD COLUMN "cat_Dog" BIGINT NOT NULL DEFAULT 0;

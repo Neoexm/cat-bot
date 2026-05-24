@@ -235,9 +235,9 @@ class Model:
 
     @classmethod
     async def filter(
-        cls, filter: str | RawSQL | None = None, *args, refetch: bool = True, add_primary_key: bool = True, **kwargs
+        self, filter: str | RawSQL | None = None, *args, refetch: bool = True, add_primary_key: bool = True, **kwargs
     ) -> AsyncGenerator[ModelInstance, None]:
-        table = cls.__name__.lower()
+        table = self.__name__.lower()
         select = "*"
         if "fields" in kwargs:
             if add_primary_key and cls._primary_key not in kwargs["fields"]:
@@ -275,8 +275,8 @@ class Model:
             yield row
 
     @classmethod
-    async def all(cls) -> AsyncGenerator[ModelInstance, None]:
-        async for row in cls.filter():
+    async def all(self) -> AsyncGenerator[ModelInstance, None]:
+        async for row in self.filter():
             yield row
 
     @classmethod

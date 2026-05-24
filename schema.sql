@@ -126,6 +126,7 @@ CREATE TABLE public.profile (
     "cat_Real" integer DEFAULT 0,
     "cat_Ultimate" integer DEFAULT 0,
     "cat_eGirl" integer DEFAULT 0,
+    "cat_Dog" bigint NOT NULL DEFAULT 0,
     first boolean DEFAULT false,
     second boolean DEFAULT false,
     third boolean DEFAULT false,
