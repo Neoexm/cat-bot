@@ -4,8 +4,7 @@ import os
 TOKEN = ""
 
 # db password for postgres
-# user - cat_bot, database - cat_bot, ip - localhost, port - default
-# Skye: defaulting to 'cat_bot_password' because I know you'll forget to set the env var
+DB_HOST = os.environ.get("psql_host", "127.0.0.1")
 DB_PASS = os.environ.get("psql_password", "cat_bot_password")
 
 #
