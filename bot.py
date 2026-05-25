@@ -34,6 +34,23 @@ import catpg
 import config
 import database
 
+logger = logging.getLogger()
+logger.setLevel(logging.DEBUG)
+handler = logging.StreamHandler()
+handler.setLevel(logging.INFO)
+logger.addHandler(handler)
+log_level = logging.INFO
+
+try:
+    # this is a messy closed source script which injects into logging module to do statistics
+    # inside discord.py, it only intercepts the amount of status codes and ratelimits
+    # everything else is from main.py logging.debug() statements
+    import stats  # noqa: F401
+
+    log_level = logging.DEBUG
+except ImportError:
+    pass
+
 filtered_errors = [
     # inactionable/junk discord api errors
     "Too Many Requests",
