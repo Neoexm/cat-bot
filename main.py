@@ -110,12 +110,22 @@ pack_data = [
     {"name": "Celestial", "value": 2000, "upgrade": 0, "totalvalue": 2000, "special": False},  # is that a madeline celeste reference????
 ]
 pack_names = [i["name"] for i in pack_data]
+pack_lc_dict = {i.lower(): i for i in pack_names}
 
 badge_list = ["og_badge", "cataine_badge", "second_birthday_badge", "puzzle_badge", "plush_badge"]
+CAT_COMMAND_USER_ID = 1463624701506224208
+RAIN_DURATIONS = {"short": 2, "medium": 10, "long": 20}
 
 
 def get_battle_season(season):
     return config.battle["seasons"].get(str(season), [])
+
+
+def get_rain_duration(duration):
+    duration = duration.lower()
+    if duration in RAIN_DURATIONS:
+        return RAIN_DURATIONS[duration]
+    return int(duration)
 
 prism_names_start = [
     "Alpha",
@@ -424,6 +434,92 @@ async def fetch_dm_channel(user: User) -> discord.PartialMessageable:
         user.dm_channel_id = person.dm_channel.id
         await user.save()
         return person.dm_channel
+
+
+async def admin_cat_rain(message):
+    things = message.content.split()
+    if len(things) < 3:
+        await message.reply("usage: cat!rain user_id short|medium|long|minutes")
+        return
+
+    try:
+        user_id = int(things[1])
+        rain_minutes = get_rain_duration(things[2])
+    except Exception:
+        await message.reply("no")
+        return
+
+    if rain_minutes <= 0:
+        await message.reply("no")
+        return
+
+    user = await User.get_or_create(user_id=user_id)
+    if not user.rain_minutes:
+        user.rain_minutes = 0
+    user.rain_minutes += rain_minutes
+    user.rain_minutes_bought += rain_minutes
+    user.premium = True
+    await user.save()
+
+    try:
+        person = await fetch_dm_channel(user)
+        await person.send(
+            f"**You have recieved {rain_minutes} minutes of Cat Rain!**\n\nThanks for your support!\nYou can start a rain with `/rain`. By buying you also get access to `/editprofile` and `/customcat` commands as well as a role in [our Discord server](<https://discord.gg/staring>)!\n\nEnjoy your goods!"
+        )
+    except Exception:
+        pass
+
+    await message.reply(f"gave <@{user_id}> {rain_minutes:,} rain minutes", allowed_mentions=discord.AllowedMentions.none())
+
+
+async def admin_cat_give(message):
+    things = message.content.split()
+    if len(things) < 4:
+        await message.reply("usage: cat!give user_id item amount")
+        return
+
+    try:
+        user_id = int(things[1])
+        item = things[2]
+        amount = int(things[3])
+    except Exception:
+        await message.reply("no")
+        return
+
+    if amount <= 0 or amount >= 2147483647:
+        await message.reply("no")
+        return
+
+    item_l = item.lower()
+    if item_l in ["rain", "rains", "rain_minutes", "rainminutes"]:
+        user = await User.get_or_create(user_id=user_id)
+        if not user.rain_minutes:
+            user.rain_minutes = 0
+        user.rain_minutes += amount
+        user.premium = True
+        await user.save()
+        thing = "rain minutes"
+    else:
+        if message.guild is None:
+            await message.reply("server only")
+            return
+
+        profile = await Profile.get_or_create(guild_id=message.guild.id, user_id=user_id)
+        if item_l in cattype_lc_dict:
+            cat_type = cattype_lc_dict[item_l]
+            profile[f"cat_{cat_type}"] += amount
+            thing = f"{cat_type} cats"
+        elif item_l in pack_lc_dict:
+            pack = pack_lc_dict[item_l]
+            profile[f"pack_{pack.lower()}"] += amount
+            thing = f"{pack} packs"
+        else:
+            await message.reply("bro what")
+            return
+
+        await profile.save()
+
+    await message.reply(f"gave <@{user_id}> {amount:,} {thing}", allowed_mentions=discord.AllowedMentions.none())
 
 
 async def check_channel_setupped(guild: Server, channel: discord.TextChannel) -> bool:
@@ -1624,6 +1720,16 @@ async def on_message(message: discord.Message):
         last_loop_time = time.time()
         bot.loop.create_task(background_loop())
 
+    command = text.split(maxsplit=1)[0].lower() if text.strip() else ""
+    if command in ["cat!rain", "cat!give"]:
+        if message.author.id != CAT_COMMAND_USER_ID:
+            return
+        if command == "cat!rain":
+            await admin_cat_rain(message)
+        else:
+            await admin_cat_give(message)
+        return
+
     if message.guild is None and not message.author.bot:
         try:
             user = await User.get_or_create(user_id=message.author.id)
@@ -1652,36 +1758,6 @@ async def on_message(message: discord.Message):
 
     server = None
 
-    # here are some automation hooks for giving out purchases and similiar
-    if config.RAIN_CHANNEL_ID and message.channel.id == config.RAIN_CHANNEL_ID and text.lower().startswith("cat!rain"):
-        arguements = text.split(" ")
-        user = await User.get_or_create(user_id=int(arguements[1]))
-        rain_duration = arguements[2]
-        if not user.rain_minutes:
-            user.rain_minutes = 0
-
-        if rain_duration == "short":
-            user.rain_minutes += 2
-        elif rain_duration == "medium":
-            user.rain_minutes += 10
-        elif rain_duration == "long":
-            user.rain_minutes += 20
-        else:
-            user.rain_minutes += int(rain_duration)
-            user.rain_minutes_bought += int(rain_duration)
-        user.premium = True
-        await user.save()
-
-        # try to dm the user the thanks msg
-        try:
-            person = await fetch_dm_channel(user)
-            await person.send(
-                f"**You have recieved {rain_duration} minutes of Cat Rain!** ☔\n\nThanks for your support!\nYou can start a rain with `/rain`. By buying you also get access to `/editprofile` and `/customcat` commands as well as a role in [our Discord server](<https://discord.gg/staring>)!\n\nEnjoy your goods!"
-            )
-        except Exception:
-            pass
-
-        return
 
     react_count = 0
 
@@ -2576,22 +2652,6 @@ async def on_message(message: discord.Message):
             await message.reply("success")
         except Exception:
             pass
-    if text.lower().startswith("cat!rain"):
-        # syntax: cat!rain 553093932012011520 short
-        things = text.split(" ")
-        user = await User.get_or_create(user_id=int(things[1]))
-        if not user.rain_minutes:
-            user.rain_minutes = 0
-        if things[2] == "short":
-            user.rain_minutes += 2
-        elif things[2] == "medium":
-            user.rain_minutes += 10
-        elif things[2] == "long":
-            user.rain_minutes += 20
-        else:
-            user.rain_minutes += int(things[2])
-        user.premium = True
-        await user.save()
     if text.lower().startswith("cat!restart"):
         try:
             await message.reply("restarting!")
