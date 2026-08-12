@@ -1385,7 +1385,7 @@ async def background_loop():
     reactions_ratelimit = {}
     catchcooldown = {}
     fakecooldown = {}
-    await bot.change_presence(activity=discord.CustomActivity(name=f"Catting in {len(bot.guilds):,} servers"))
+    await bot.change_presence(activity=discord.CustomActivity(name="Catting in 170,000 servers"))
 
     # save chaos
     if config.chaos_current is not None:
