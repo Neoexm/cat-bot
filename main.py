@@ -113,7 +113,7 @@ pack_names = [i["name"] for i in pack_data]
 pack_lc_dict = {i.lower(): i for i in pack_names}
 
 badge_list = ["og_badge", "cataine_badge", "second_birthday_badge", "puzzle_badge", "plush_badge"]
-CAT_COMMAND_USER_ID = 1463624701506224208
+CAT_COMMAND_USER_ID = 242377188282728448
 RAIN_DURATIONS = {"short": 2, "medium": 10, "long": 20}
 
 
